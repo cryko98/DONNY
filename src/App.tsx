@@ -31,12 +31,20 @@ const NAV_LINKS = [
 ];
 
 const SOCIAL_LINKS = [
-  { name: 'Twitter', icon: <Twitter className="w-5 h-5" />, href: 'https://x.com/LobstarWilde' },
+  { name: 'Twitter', icon: <Twitter className="w-5 h-5" />, href: 'https://x.com/SirDonnyLizard' },
   { name: 'Telegram', icon: <MessageSquare className="w-5 h-5" />, href: '#' },
   { name: 'Dexscreener', icon: <Globe className="w-5 h-5" />, href: '#' },
 ];
 
 export default function App() {
+  const [terminalLines, setTerminalLines] = React.useState<string[]>([]);
+  const [allLines, setAllLines] = React.useState<string[]>([
+    "Initializing Donny protocol...",
+    "Loading reptilian brain modules...",
+    "Connecting to Solana RPC...",
+    "Establishing neural link..."
+  ]);
+
   useEffect(() => {
     const scriptId = 'twitter-wjs';
     
@@ -57,7 +65,21 @@ export default function App() {
       initTwitter();
     }
 
-    // Multiple retries for different network speeds
+    const fetchTweets = async () => {
+      try {
+        const res = await fetch('/api/tweets');
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          const tweetLines = data.map(t => `[TWEET] ${t.text}`);
+          setAllLines(prev => [...prev, "[SUCCESS] DONNY IS AWAKE", ...tweetLines]);
+        }
+      } catch (err) {
+        setAllLines(prev => [...prev, "[ERROR] Could not sync with Twitter consciousness"]);
+      }
+    };
+
+    fetchTweets();
+
     const timers = [
       setTimeout(initTwitter, 500),
       setTimeout(initTwitter, 1500),
@@ -66,6 +88,16 @@ export default function App() {
 
     return () => timers.forEach(clearTimeout);
   }, []);
+
+  // Typing effect simulation
+  useEffect(() => {
+    if (terminalLines.length < allLines.length) {
+      const timer = setTimeout(() => {
+        setTerminalLines(prev => [...prev, allLines[prev.length]]);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [terminalLines, allLines]);
 
   const handleRefreshTimeline = () => {
     if ((window as any).twttr && (window as any).twttr.widgets) {
@@ -219,13 +251,23 @@ export default function App() {
                     </div>
                     <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest">donny_core_v1.0.sh</div>
                   </div>
-                  <div className="p-6 font-mono text-sm space-y-2">
-                    <div className="text-neon-green">$ initialize_donny_protocol</div>
-                    <div className="text-white/40">{'>'} Loading reptilian brain modules...</div>
-                    <div className="text-white/40">{'>'} Connecting to Solana RPC...</div>
-                    <div className="text-white/40">{'>'} Establishing Twitter link @LobstarWilde...</div>
-                    <div className="text-neon-green">[SUCCESS] DONNY IS AWAKE</div>
-                    <div className="pt-4 text-white/80 italic">"The sun is warm, but the charts are cold. I prefer the charts."</div>
+                  <div className="p-6 font-mono text-sm space-y-2 max-h-[300px] overflow-y-auto">
+                    {terminalLines.map((line, i) => (
+                      <div key={i} className={cn(
+                        line.startsWith("[SUCCESS]") ? "text-neon-green" : 
+                        line.startsWith("[ERROR]") ? "text-red-500" :
+                        line.startsWith("[TWEET]") ? "text-white italic" : "text-white/40"
+                      )}>
+                        {line.startsWith("[TWEET]") ? (
+                          <span className="flex gap-2">
+                            <span className="text-neon-green shrink-0">{">"}</span>
+                            <span>{line.replace("[TWEET] ", "")}</span>
+                          </span>
+                        ) : (
+                          line.startsWith("[SUCCESS]") ? `$ ${line}` : `> ${line}`
+                        )}
+                      </div>
+                    ))}
                     <div className="animate-pulse inline-block w-2 h-4 bg-neon-green ml-1 align-middle" />
                   </div>
                 </div>
@@ -253,7 +295,7 @@ export default function App() {
                   className="twitter-timeline" 
                   data-theme="dark" 
                   data-chrome="noheader nofooter transparent"
-                  href="https://twitter.com/LobstarWilde"
+                  href="https://twitter.com/SirDonnyLizard"
                 >
                   <div className="flex flex-col items-center gap-4 text-white/40 font-mono text-sm text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-green"></div>
@@ -273,7 +315,7 @@ export default function App() {
                   </button>
                   
                   <a 
-                    href="https://x.com/LobstarWilde" 
+                    href="https://x.com/SirDonnyLizard" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-neon-green text-xs font-mono hover:underline flex items-center gap-1"

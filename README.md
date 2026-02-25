@@ -24,7 +24,7 @@ npm run dev
 
 ## Features
 
-- **Twitter Timeline:** Real-time feed from @LobstarWilde.
+- **Twitter Timeline:** Real-time feed from @SirDonnyLizard.
 - **Responsive UI:** Built with Tailwind CSS 4.
 - **Animations:** Powered by Motion.
 - **SPA Routing:** Configured via `vercel.json`.
