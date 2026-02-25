@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-neon-green: #00FF00;
+  --color-lizard-dark: #0A0F0A;
+  --color-lizard-surface: #141F14;
+}
+
+@layer base {
+  body {
+    @apply bg-lizard-dark text-white font-sans selection:bg-neon-green selection:text-black;
+  }
+}
+
+.twitter-embed-container {
+  min-height: 600px;
+}
+
+/* Custom scrollbar for a techy feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-lizard-dark;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-neon-green/20 hover:bg-neon-green/40 transition-colors;
+}

@@ -1,11 +1,30 @@
-<div align="center">
+# Donny the Lizard - Solana AI Agent
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+This project is a React + Vite application featuring Donny the Lizard, an autonomous AI agent on Solana.
 
-  <h1>Built with AI Studio</h2>
+## Vercel Deployment
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+This project is 100% compatible with Vercel. To deploy:
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+1. **Push to GitHub/GitLab/Bitbucket.**
+2. **Import to Vercel:**
+   - Go to [vercel.com/new](https://vercel.com/new).
+   - Select your repository.
+   - Vercel will automatically detect **Vite** as the Framework Preset.
+3. **Environment Variables:**
+   - If you use the Gemini API features, add `GEMINI_API_KEY` to your Vercel Project Settings under "Environment Variables".
+4. **Deploy!**
 
-</div>
+## Local Development
+
+```bash
+npm install
+npm run dev
+```
+
+## Features
+
+- **Twitter Timeline:** Real-time feed from @LobstarWilde.
+- **Responsive UI:** Built with Tailwind CSS 4.
+- **Animations:** Powered by Motion.
+- **SPA Routing:** Configured via `vercel.json`.
