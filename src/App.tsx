@@ -51,39 +51,25 @@ export default function App() {
   ]);
 
   useEffect(() => {
-    // Function to initialize Twitter widgets
     const initTwitter = () => {
       const twttr = (window as any).twttr;
       if (twttr && twttr.widgets) {
-        twttr.widgets.load(document.getElementById('timeline-container'));
+        twttr.widgets.load();
       }
     };
 
-    // Load script if not present
-    if (!(window as any).twttr) {
-      const script = document.createElement('script');
-      script.src = "https://platform.twitter.com/widgets.js";
-      script.async = true;
-      script.charset = "utf-8";
-      script.onload = initTwitter;
-      document.body.appendChild(script);
-    } else {
-      initTwitter();
-    }
+    // Initial load attempt
+    initTwitter();
 
-    // Polling as a fallback for slow script loads or React render timing
-    const interval = setInterval(() => {
-      if ((window as any).twttr && (window as any).twttr.widgets) {
-        initTwitter();
-        // If we see an iframe inside our container, we can stop polling
-        const container = document.getElementById('timeline-container');
-        if (container && container.querySelector('iframe')) {
-          clearInterval(interval);
-        }
-      }
-    }, 1000);
+    // Multiple retries to handle React's rendering cycle
+    const timers = [
+      setTimeout(initTwitter, 500),
+      setTimeout(initTwitter, 1500),
+      setTimeout(initTwitter, 3000),
+      setTimeout(initTwitter, 5000)
+    ];
 
-    return () => clearInterval(interval);
+    return () => timers.forEach(clearTimeout);
   }, []);
 
   // Typing effect simulation
@@ -292,10 +278,7 @@ export default function App() {
                   className="twitter-timeline" 
                   href="https://twitter.com/SirDonnyLizard?ref_src=twsrc%5Etfw"
                 >
-                  <div className="flex flex-col items-center gap-4 text-white/40 font-mono text-sm text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-green"></div>
-                    <p>Connecting to SirDonnyLizard's feed...</p>
-                  </div>
+                  Tweets by SirDonnyLizard
                 </a>
                 
                 <div className="mt-8 flex flex-col items-center gap-4">
