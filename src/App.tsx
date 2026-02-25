@@ -38,11 +38,16 @@ const SOCIAL_LINKS = [
 
 export default function App() {
   const [terminalLines, setTerminalLines] = React.useState<string[]>([]);
-  const [allLines, setAllLines] = React.useState<string[]>([
+  const [allLines] = React.useState<string[]>([
     "Initializing Donny protocol...",
     "Loading reptilian brain modules...",
     "Connecting to Solana RPC...",
-    "Establishing neural link..."
+    "Establishing neural link...",
+    "[SUCCESS] DONNY IS AWAKE",
+    "Analyzing market sentiment...",
+    "Cold-blooded logic: ACTIVE",
+    "Shedding skin, gaining SOL...",
+    "Donny is watching the charts."
   ]);
 
   useEffect(() => {
@@ -59,26 +64,12 @@ export default function App() {
       script.id = scriptId;
       script.src = "https://platform.twitter.com/widgets.js";
       script.async = true;
+      script.charset = "utf-8";
       script.onload = initTwitter;
       document.body.appendChild(script);
     } else {
       initTwitter();
     }
-
-    const fetchTweets = async () => {
-      try {
-        const res = await fetch('/api/tweets');
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          const tweetLines = data.map(t => `[TWEET] ${t.text}`);
-          setAllLines(prev => [...prev, "[SUCCESS] DONNY IS AWAKE", ...tweetLines]);
-        }
-      } catch (err) {
-        setAllLines(prev => [...prev, "[ERROR] Could not sync with Twitter consciousness"]);
-      }
-    };
-
-    fetchTweets();
 
     const timers = [
       setTimeout(initTwitter, 500),
@@ -94,7 +85,7 @@ export default function App() {
     if (terminalLines.length < allLines.length) {
       const timer = setTimeout(() => {
         setTerminalLines(prev => [...prev, allLines[prev.length]]);
-      }, 600);
+      }, 800);
       return () => clearTimeout(timer);
     }
   }, [terminalLines, allLines]);
@@ -295,14 +286,11 @@ export default function App() {
                   className="twitter-timeline" 
                   data-theme="dark" 
                   data-chrome="noheader nofooter transparent"
-                  href="https://twitter.com/SirDonnyLizard"
+                  href="https://twitter.com/SirDonnyLizard?ref_src=twsrc%5Etfw"
                 >
                   <div className="flex flex-col items-center gap-4 text-white/40 font-mono text-sm text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-green"></div>
                     <p>Loading Donny's consciousness...</p>
-                    <p className="text-[10px] max-w-xs opacity-50">
-                      If the feed doesn't appear, please disable your ad-blocker or tracking protection for this site.
-                    </p>
                   </div>
                 </a>
                 
