@@ -40,7 +40,7 @@ export default function App() {
   useEffect(() => {
     const scriptId = 'twitter-wjs';
     
-    const loadWidgets = () => {
+    const initTwitter = () => {
       if ((window as any).twttr && (window as any).twttr.widgets) {
         (window as any).twttr.widgets.load();
       }
@@ -51,16 +51,29 @@ export default function App() {
       script.id = scriptId;
       script.src = "https://platform.twitter.com/widgets.js";
       script.async = true;
-      script.onload = loadWidgets;
+      script.onload = initTwitter;
       document.body.appendChild(script);
     } else {
-      loadWidgets();
+      initTwitter();
     }
 
-    // Fallback check after a short delay to ensure rendering
-    const timer = setTimeout(loadWidgets, 1000);
-    return () => clearTimeout(timer);
+    // Multiple retries for different network speeds
+    const timers = [
+      setTimeout(initTwitter, 500),
+      setTimeout(initTwitter, 1500),
+      setTimeout(initTwitter, 3000)
+    ];
+
+    return () => timers.forEach(clearTimeout);
   }, []);
+
+  const handleRefreshTimeline = () => {
+    if ((window as any).twttr && (window as any).twttr.widgets) {
+      (window as any).twttr.widgets.load();
+    } else {
+      window.location.reload();
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -235,27 +248,37 @@ export default function App() {
             </div>
 
             <div className="max-w-2xl mx-auto">
-              <div className="twitter-embed-container border border-neon-green/20 rounded-lg overflow-hidden bg-white/5 p-4 min-h-[500px] flex flex-col items-center justify-center">
+              <div className="twitter-embed-container border border-neon-green/20 rounded-lg overflow-hidden bg-white/5 p-4 min-h-[500px] flex flex-col items-center justify-center relative">
                 <a 
                   className="twitter-timeline" 
                   data-theme="dark" 
                   data-chrome="noheader nofooter transparent"
-                  href="https://twitter.com/LobstarWilde?ref_src=twsrc%5Etfw"
+                  href="https://twitter.com/LobstarWilde"
                 >
-                  <div className="flex flex-col items-center gap-4 text-white/40 font-mono text-sm">
+                  <div className="flex flex-col items-center gap-4 text-white/40 font-mono text-sm text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-green"></div>
-                    Loading Donny's consciousness...
-                    <span className="text-xs opacity-50">(If it doesn't load, your browser might be blocking the feed)</span>
+                    <p>Loading Donny's consciousness...</p>
+                    <p className="text-[10px] max-w-xs opacity-50">
+                      If the feed doesn't appear, please disable your ad-blocker or tracking protection for this site.
+                    </p>
                   </div>
                 </a>
-                <div className="mt-4">
+                
+                <div className="mt-8 flex flex-col items-center gap-4">
+                  <button 
+                    onClick={handleRefreshTimeline}
+                    className="text-[10px] font-mono text-neon-green/60 hover:text-neon-green border border-neon-green/20 hover:border-neon-green/50 px-3 py-1 rounded-sm transition-all uppercase tracking-widest"
+                  >
+                    Force Reload Feed
+                  </button>
+                  
                   <a 
                     href="https://x.com/LobstarWilde" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-neon-green text-xs font-mono hover:underline flex items-center gap-1"
                   >
-                    View on X.com <ExternalLink className="w-3 h-3" />
+                    View directly on X.com <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
               </div>
