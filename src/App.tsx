@@ -37,39 +37,79 @@ const SOCIAL_LINKS = [
 ];
 
 const TwitterTimeline = () => {
-  useEffect(() => {
-    // Load Twitter script dynamically
-    const script = document.createElement('script');
-    script.src = "https://platform.twitter.com/widgets.js";
-    script.async = true;
-    script.charset = "utf-8";
-    document.body.appendChild(script);
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
-    // Initialize widgets once script is loaded
-    script.onload = () => {
-      if ((window as any).twttr && (window as any).twttr.widgets) {
-        (window as any).twttr.widgets.load();
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadTwitter = () => {
+      // Check if the script is already in the document
+      const existingScript = document.querySelector('script[src="https://platform.twitter.com/widgets.js"]');
+      
+      const renderTimeline = () => {
+        if (isMounted && (window as any).twttr && (window as any).twttr.widgets && containerRef.current) {
+          // Clear container before rendering to avoid duplicates
+          containerRef.current.innerHTML = '';
+          (window as any).twttr.widgets.createTimeline(
+            {
+              sourceType: 'profile',
+              screenName: 'SirDonnyLizard'
+            },
+            containerRef.current,
+            {
+              theme: 'dark',
+              chrome: 'transparent noheader nofooter',
+              height: 600,
+              width: '100%'
+            }
+          ).then(() => {
+            console.log('Twitter timeline loaded successfully');
+          }).catch((err: any) => {
+            console.error('Error creating Twitter timeline:', err);
+          });
+        }
+      };
+
+      if (!(window as any).twttr) {
+        if (!existingScript) {
+          const script = document.createElement('script');
+          script.setAttribute('src', 'https://platform.twitter.com/widgets.js');
+          script.setAttribute('async', 'true');
+          script.setAttribute('charset', 'utf-8');
+          document.head.appendChild(script);
+          script.onload = renderTimeline;
+        } else {
+          // Script exists but twttr not yet ready
+          const interval = setInterval(() => {
+            if ((window as any).twttr) {
+              clearInterval(interval);
+              renderTimeline();
+            }
+          }, 100);
+          setTimeout(() => clearInterval(interval), 5000); // Timeout after 5s
+        }
+      } else {
+        renderTimeline();
       }
     };
 
+    loadTwitter();
+
     return () => {
-      // Cleanup script if component unmounts
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
+      isMounted = false;
     };
   }, []);
 
   return (
-    <a 
-      className="twitter-timeline" 
-      data-theme="dark"
-      data-chrome="transparent noheader nofooter"
-      data-height="600"
-      href="https://twitter.com/SirDonnyLizard?ref_src=twsrc%5Etfw"
+    <div 
+      ref={containerRef} 
+      className="w-full min-h-[600px] flex items-center justify-center bg-white/2 rounded-lg"
     >
-      Tweets by SirDonnyLizard
-    </a>
+      <div className="flex flex-col items-center gap-4 text-white/20 font-mono text-sm">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-green"></div>
+        <p>Initializing Neural Feed...</p>
+      </div>
+    </div>
   );
 };
 
@@ -292,13 +332,6 @@ export default function App() {
                 <TwitterTimeline />
                 
                 <div className="mt-8 flex flex-col items-center gap-4">
-                  <button 
-                    onClick={handleRefreshTimeline}
-                    className="text-[10px] font-mono text-neon-green/60 hover:text-neon-green border border-neon-green/20 hover:border-neon-green/50 px-3 py-1 rounded-sm transition-all uppercase tracking-widest"
-                  >
-                    Force Reload Feed
-                  </button>
-                  
                   <a 
                     href="https://x.com/SirDonnyLizard" 
                     target="_blank" 
