@@ -36,6 +36,43 @@ const SOCIAL_LINKS = [
   { name: 'Dexscreener', icon: <Globe className="w-5 h-5" />, href: '#' },
 ];
 
+const TwitterTimeline = () => {
+  useEffect(() => {
+    // Load Twitter script dynamically
+    const script = document.createElement('script');
+    script.src = "https://platform.twitter.com/widgets.js";
+    script.async = true;
+    script.charset = "utf-8";
+    document.body.appendChild(script);
+
+    // Initialize widgets once script is loaded
+    script.onload = () => {
+      if ((window as any).twttr && (window as any).twttr.widgets) {
+        (window as any).twttr.widgets.load();
+      }
+    };
+
+    return () => {
+      // Cleanup script if component unmounts
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
+  return (
+    <a 
+      className="twitter-timeline" 
+      data-theme="dark"
+      data-chrome="transparent noheader nofooter"
+      data-height="600"
+      href="https://twitter.com/SirDonnyLizard?ref_src=twsrc%5Etfw"
+    >
+      Tweets by SirDonnyLizard
+    </a>
+  );
+};
+
 export default function App() {
   const [terminalLines, setTerminalLines] = React.useState<string[]>([]);
   const [allLines] = React.useState<string[]>([
@@ -49,28 +86,6 @@ export default function App() {
     "Shedding skin, gaining SOL...",
     "Donny is watching the charts."
   ]);
-
-  useEffect(() => {
-    const initTwitter = () => {
-      const twttr = (window as any).twttr;
-      if (twttr && twttr.widgets) {
-        twttr.widgets.load();
-      }
-    };
-
-    // Initial load attempt
-    initTwitter();
-
-    // Multiple retries to handle React's rendering cycle
-    const timers = [
-      setTimeout(initTwitter, 500),
-      setTimeout(initTwitter, 1500),
-      setTimeout(initTwitter, 3000),
-      setTimeout(initTwitter, 5000)
-    ];
-
-    return () => timers.forEach(clearTimeout);
-  }, []);
 
   // Typing effect simulation
   useEffect(() => {
@@ -273,13 +288,8 @@ export default function App() {
             </div>
 
             <div className="max-w-2xl mx-auto">
-              <div id="timeline-container" className="twitter-embed-container border border-neon-green/20 rounded-lg overflow-hidden bg-white/5 p-4 min-h-[500px] flex flex-col items-center justify-center relative">
-                <a 
-                  className="twitter-timeline" 
-                  href="https://twitter.com/SirDonnyLizard?ref_src=twsrc%5Etfw"
-                >
-                  Tweets by SirDonnyLizard
-                </a>
+              <div id="timeline-container" className="twitter-embed-container border border-neon-green/20 rounded-lg overflow-hidden bg-white/5 p-4 min-h-[600px] relative">
+                <TwitterTimeline />
                 
                 <div className="mt-8 flex flex-col items-center gap-4">
                   <button 
