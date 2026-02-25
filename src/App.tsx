@@ -40,75 +40,41 @@ const TwitterTimeline = () => {
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let isMounted = true;
+    // Load the Twitter widgets script manually to ensure it executes in React
+    const script = document.createElement('script');
+    script.src = "https://platform.twitter.com/widgets.js";
+    script.async = true;
+    script.charset = "utf-8";
+    document.body.appendChild(script);
 
-    const loadTwitter = () => {
-      // Check if the script is already in the document
-      const existingScript = document.querySelector('script[src="https://platform.twitter.com/widgets.js"]');
-      
-      const renderTimeline = () => {
-        if (isMounted && (window as any).twttr && (window as any).twttr.widgets && containerRef.current) {
-          // Clear container before rendering to avoid duplicates
-          containerRef.current.innerHTML = '';
-          (window as any).twttr.widgets.createTimeline(
-            {
-              sourceType: 'profile',
-              screenName: 'SirDonnyLizard'
-            },
-            containerRef.current,
-            {
-              theme: 'dark',
-              chrome: 'transparent noheader nofooter',
-              height: 600,
-              width: '100%'
-            }
-          ).then(() => {
-            console.log('Twitter timeline loaded successfully');
-          }).catch((err: any) => {
-            console.error('Error creating Twitter timeline:', err);
-          });
-        }
-      };
-
-      if (!(window as any).twttr) {
-        if (!existingScript) {
-          const script = document.createElement('script');
-          script.setAttribute('src', 'https://platform.twitter.com/widgets.js');
-          script.setAttribute('async', 'true');
-          script.setAttribute('charset', 'utf-8');
-          document.head.appendChild(script);
-          script.onload = renderTimeline;
-        } else {
-          // Script exists but twttr not yet ready
-          const interval = setInterval(() => {
-            if ((window as any).twttr) {
-              clearInterval(interval);
-              renderTimeline();
-            }
-          }, 100);
-          setTimeout(() => clearInterval(interval), 5000); // Timeout after 5s
-        }
-      } else {
-        renderTimeline();
+    // If the script is already loaded, we need to tell it to scan the DOM for new links
+    script.onload = () => {
+      if ((window as any).twttr && (window as any).twttr.widgets) {
+        (window as any).twttr.widgets.load(containerRef.current);
       }
     };
 
-    loadTwitter();
+    // Fallback: if script was already there, try loading widgets immediately
+    if ((window as any).twttr && (window as any).twttr.widgets) {
+      (window as any).twttr.widgets.load(containerRef.current);
+    }
 
     return () => {
-      isMounted = false;
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, []);
 
   return (
-    <div 
-      ref={containerRef} 
-      className="w-full min-h-[600px] flex items-center justify-center bg-white/2 rounded-lg"
-    >
-      <div className="flex flex-col items-center gap-4 text-white/20 font-mono text-sm">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-green"></div>
-        <p>Initializing Neural Feed...</p>
-      </div>
+    <div ref={containerRef} className="w-full flex justify-center">
+      <a 
+        className="twitter-timeline" 
+        data-theme="dark"
+        href="https://twitter.com/SirDonnyLizard?ref_src=twsrc%5Etfw"
+      >
+        Tweets by SirDonnyLizard
+      </a>
     </div>
   );
 };
