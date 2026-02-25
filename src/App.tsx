@@ -51,17 +51,17 @@ export default function App() {
   ]);
 
   useEffect(() => {
-    const scriptId = 'twitter-wjs';
-    
+    // Function to initialize Twitter widgets
     const initTwitter = () => {
-      if ((window as any).twttr && (window as any).twttr.widgets) {
-        (window as any).twttr.widgets.load();
+      const twttr = (window as any).twttr;
+      if (twttr && twttr.widgets) {
+        twttr.widgets.load(document.getElementById('timeline-container'));
       }
     };
 
-    if (!document.getElementById(scriptId)) {
+    // Load script if not present
+    if (!(window as any).twttr) {
       const script = document.createElement('script');
-      script.id = scriptId;
       script.src = "https://platform.twitter.com/widgets.js";
       script.async = true;
       script.charset = "utf-8";
@@ -71,13 +71,19 @@ export default function App() {
       initTwitter();
     }
 
-    const timers = [
-      setTimeout(initTwitter, 500),
-      setTimeout(initTwitter, 1500),
-      setTimeout(initTwitter, 3000)
-    ];
+    // Polling as a fallback for slow script loads or React render timing
+    const interval = setInterval(() => {
+      if ((window as any).twttr && (window as any).twttr.widgets) {
+        initTwitter();
+        // If we see an iframe inside our container, we can stop polling
+        const container = document.getElementById('timeline-container');
+        if (container && container.querySelector('iframe')) {
+          clearInterval(interval);
+        }
+      }
+    }, 1000);
 
-    return () => timers.forEach(clearTimeout);
+    return () => clearInterval(interval);
   }, []);
 
   // Typing effect simulation
@@ -281,16 +287,14 @@ export default function App() {
             </div>
 
             <div className="max-w-2xl mx-auto">
-              <div className="twitter-embed-container border border-neon-green/20 rounded-lg overflow-hidden bg-white/5 p-4 min-h-[500px] flex flex-col items-center justify-center relative">
+              <div id="timeline-container" className="twitter-embed-container border border-neon-green/20 rounded-lg overflow-hidden bg-white/5 p-4 min-h-[500px] flex flex-col items-center justify-center relative">
                 <a 
                   className="twitter-timeline" 
-                  data-theme="dark" 
-                  data-chrome="noheader nofooter transparent"
                   href="https://twitter.com/SirDonnyLizard?ref_src=twsrc%5Etfw"
                 >
                   <div className="flex flex-col items-center gap-4 text-white/40 font-mono text-sm text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-green"></div>
-                    <p>Loading Donny's consciousness...</p>
+                    <p>Connecting to SirDonnyLizard's feed...</p>
                   </div>
                 </a>
                 
